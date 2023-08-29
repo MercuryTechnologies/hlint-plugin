@@ -1,0 +1,30 @@
+cabal-version:      3.0
+name:               hlint-plugin
+version:            1.0.0
+synopsis:           GHC plugin for hlint
+description:        This package provides an GHC plugin that runs `hlint` on the
+                    compiled module.  This has the advantage that:
+                    .
+                    * When you rebuild the project you only need to lint modules
+                      that changed since the last build
+                    .
+                    * The module source does not need to be reparsed by `hlint`,
+                      which improves efficiency
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Mercury Technologies
+maintainer:         gabriella@mercury.com
+copyright:          2023 Mercury Technologies
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+
+library
+    hs-source-dirs:   src
+    build-depends:    base >=4.15.0.0 && < 5
+                    , containers
+                    , ghc
+                    , hlint
+    exposed-modules:  HLint.Plugin
+                    , HLint.Plugin.Settings
+    default-language: Haskell2010
+    ghc-options:      -Wall
