@@ -42,7 +42,6 @@ plugin = Plugins.defaultPlugin
     , pluginRecompile = Plugins.purePlugin
     }
   where
-    parsedResultAction :: [Plugins.CommandLineOption] -> Plugins.ModSummary -> Plugins.ParsedResult -> Plugins.Hsc Plugins.ParsedResult
     parsedResultAction arguments _ parsedResult = do
         (_parseFlags, classifies, hint) <- do
             Plugins.liftIO (Settings.argsSettings arguments)
@@ -64,9 +63,7 @@ plugin = Plugins.defaultPlugin
 
         let diagOpts = Diagnostic.initDiagOpts dynFlags
 
-        let ghcMessageOpts = Diagnostic.initPrintConfig dynFlags
-
-        Plugins.liftIO (Errors.printOrThrowDiagnostics logger ghcMessageOpts diagOpts messages)
+        Plugins.liftIO (Errors.printOrThrowDiagnostics logger diagOpts messages)
 
         pure parsedResult
 

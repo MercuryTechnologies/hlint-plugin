@@ -1,0 +1,3 @@
+builds:
+  include:
+  - '*.x86-64_linux.*.*'

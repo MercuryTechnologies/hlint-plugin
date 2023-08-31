@@ -6,65 +6,81 @@
   };
 
   outputs = { nixpkgs, utils, ... }:
-    let
-      compiler = "ghc96";
+    utils.lib.eachDefaultSystem (system:
+    utils.lib.eachSystem [ "ghc90" "ghc92" "ghc94" "ghc96" ] (compiler:
+      let
+        config = { };
 
-    in
-      utils.lib.eachDefaultSystem (system:
-        let
-          config = { };
+        overlay = self: super: {
+          hlint-plugin =
+            self.haskell.lib.justStaticExecutables
+              self.haskell.packages."${compiler}".hlint-plugin;
 
-          overlay = self: super: {
-            hlint-plugin =
-              self.haskell.lib.justStaticExecutables
-                self.haskell.packages."${compiler}".hlint-plugin;
+          haskell = super.haskell // {
+            packages = super.haskell.packages // {
+              "${compiler}" = super.haskell.packages."${compiler}".override (old: {
+                overrides =
+                  self.lib.fold
+                    self.lib.composeExtensions
+                    (_: _: { })
+                    [ (self.haskell.lib.packageSourceOverrides {
+                        hlint = {
+                          ghc90 = "3.3.6";
+                          ghc92 = "3.4.1";
+                          ghc94 = "3.5";
+                          ghc96 = "3.6.1";
+                        }."${compiler}";
 
-            haskell = super.haskell // {
-              packages = super.haskell.packages // {
-                "${compiler}" = super.haskell.packages."${compiler}".override (old: {
-                  overrides =
-                    self.lib.fold
-                      self.lib.composeExtensions
-                      (_: _: { })
-                      [ (self.haskell.lib.packageSourceOverrides {
-                          hlint = "3.6.1";
-                          hlint-plugin = ./.;
-                        })
-                        (self.haskell.lib.packagesFromDirectory {
-                          directory = ./nix;
-                        })
-                        (hself: hsuper: {
-                          ghc-lib-parser-ex =
-                            self.haskell.lib.enableCabalFlag
-                              hsuper.ghc-lib-parser-ex
-                              "no-ghc-lib";
+                        hlint-plugin = ./.;
+                      })
 
-                          hlint =
-                            self.haskell.lib.disableCabalFlag
-                              hsuper.hlint
-                              "ghc-lib";
-                        })
-                      ];
-                });
-              };
+                      (self.haskell.lib.packagesFromDirectory {
+                        directory = {
+                          ghc90 = ./ghc90;
+                          ghc92 = ./ghc92;
+                          ghc94 = ./ghc94;
+                          ghc96 = ./ghc96;
+                        }."${compiler}";
+                      })
+
+                      # `ghc-lib-parser-ex` and `hlint` both need to be built
+                      # against the `ghc` API and not the `ghc-lib*` APIs,
+                      # otherwise the built plugin will not be accepted by GHC.
+                      (hself: hsuper: {
+                        ghc-lib-parser-ex =
+                          self.haskell.lib.enableCabalFlag
+                            hsuper.ghc-lib-parser-ex
+                            "no-ghc-lib";
+
+                        hlint =
+                          self.haskell.lib.disableCabalFlag
+                            hsuper.hlint
+                            "ghc-lib";
+                      })
+                    ];
+              });
             };
           };
+        };
 
-          pkgs =
-            import nixpkgs { inherit config system; overlays = [ overlay ]; };
+        pkgs =
+          import nixpkgs { inherit config system; overlays = [ overlay ]; };
 
-        in
-          rec {
-            packages.default = pkgs.haskell.packages."${compiler}".hlint-plugin;
+      in
+        rec {
+          packages.default = pkgs.haskell.packages."${compiler}".hlint-plugin;
 
-            apps.default = {
-              type = "app";
+          apps.default = {
+            type = "app";
 
-              program = "${pkgs.hlint-plugin}/bin/hlint-plugin";
-            };
+            program = "${pkgs.hlint-plugin}/bin/hlint-plugin";
+          };
 
-            devShells.default = pkgs.haskell.packages."${compiler}".hlint-plugin.env;
-            devShells.hlint = pkgs.haskell.packages."${compiler}".hlint.env;
-          }
-      );
+          devShells.default = pkgs.haskell.packages."${compiler}".hlint-plugin.env;
+
+          # This comes in handy when doing dev on the `hlint` package, whose
+          # dependencies can be tricky to get right using Nix
+          devShells.hlint = pkgs.haskell.packages."${compiler}".hlint.env;
+        }
+    ));
 }
