@@ -68,19 +68,15 @@
 
       in
         rec {
-          packages.default = pkgs.haskell.packages."${compiler}".hlint-plugin;
+          packages = pkgs.haskell.packages."${compiler}".hlint-plugin;
 
-          apps.default = {
+          apps = {
             type = "app";
 
             program = "${pkgs.hlint-plugin}/bin/hlint-plugin";
           };
 
-          devShells.default = pkgs.haskell.packages."${compiler}".hlint-plugin.env;
-
-          # This comes in handy when doing dev on the `hlint` package, whose
-          # dependencies can be tricky to get right using Nix
-          devShells.hlint = pkgs.haskell.packages."${compiler}".hlint.env;
+          devShells = pkgs.haskell.packages."${compiler}".hlint-plugin.env;
         }
     ));
 }
