@@ -15,6 +15,12 @@ The main advantages of doing this are:
 
 - You don't have to parse the module twice
 
+In order to build this plugin, you will need to:
+
+- build the `hlint` package with the `-f-ghc-lib` cabal configure option
+- build the `ghc-lib-parser-ex` package with the `-fno-ghc-lib` cabal configure
+  option
+
 To use this plugin, add this package as a build dependency and then enable the
 following GHC options (typically in the `ghc-options:` field of your `.cabal`
 file):
