@@ -6,8 +6,17 @@
 --   module
 --
 --  To do so, add this @hlint-plugin@ package as a build dependency of your
---  Haskell package and then add the GHC options
---  @-plugin-package hlint-plugin -fplugin HLint.Plugin@
+--  Haskell package and then add the GHC options @-fplugin HLint.Plugin@
+--  To use this plugin, add this package as a build dependency and then enable
+--  the following GHC options (typically in the @ghc-options:@ field of your
+--  @.cabal@ file):
+--
+--  > -fplugin HLint.Plugin
+--
+--  You can pass command-line options to @hlint@ using @-fplugin-opt@, like
+--  this:
+--
+--  > -fplugin HLint.Plugin -fplugin-opt='HLint.Plugin:--ignore=Redundant guard'
 module HLint.Plugin
     ( -- * Plugin
       plugin
