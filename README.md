@@ -34,3 +34,35 @@ You can pass command-line options to `hlint` using `-fplugin-opt`, like this:
 ```bash
 -fplugin HLint.Plugin -fplugin-opt='HLint.Plugin:--ignore=Redundant guard'
 ```
+
+## Development
+
+This repository uses Nix for development.  You can build this package entirely
+using Nix for a specific version of `ghc` by running:
+
+```ShellSession
+$ nix develop .#ghc${MAJOR}${MINOR}
+```
+
+… replacing `${MAJOR}` and `${MINOR}` with the major and minor version of the
+`ghc` that you're using.  For example, if you're using GHC 9.4, then you'd run:
+
+```ShellSession
+$ nix build .#ghc94
+```
+
+If you want to develop interactively using Cabal inside of a Nix shell, run:
+
+```ShellSession
+$ nix develop .#ghc${MAJOR}${MINOR}
+```
+
+Once you are inside that Nix shell, then you can use `cabal` commands, like
+`cabal build` or `cabal repl`.  You can also use `ghcid` or launch your favorite
+IDE from inside this shell.
+
+To check that this plugin works for all supported GHC versions, run:
+
+```ShellSession
+$ nix flake check
+```
