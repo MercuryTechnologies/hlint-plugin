@@ -2,12 +2,15 @@ cabal-version:      3.0
 name:               hlint-plugin
 version:            1.0.0
 synopsis:           GHC plugin for hlint
-description:        This package provides an GHC plugin that runs `hlint` on the
-                    compiled module.  The main advantages of doing this are:
-                    .
-                    * Better integration with GHC tooling
-                    * You only have to lint modules that you rebuild
-                    * You don't have to parse the module twice
+description:
+    This package provides an GHC plugin that runs `hlint` on the compiled
+    module.  The main advantages of doing this are: (A) better integration with
+    GHC tooling, (B) only linting modules that change, and (C) only parsing the
+    module once.
+    .
+    Note that this package will only build if you build the @hlint@ dependency
+    with @-f-ghc-lib@ and build the @ghc-lib-parser-ex@ dependency with
+    @-fno-ghc-lib@
 license:            BSD-3-Clause
 license-file:       LICENSE
 author:             Mercury Technologies
@@ -15,6 +18,7 @@ maintainer:         gabriella@mercury.com
 copyright:          2023 Mercury Technologies
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
+extra-source-files: README.md
 
 library
     hs-source-dirs:   src
