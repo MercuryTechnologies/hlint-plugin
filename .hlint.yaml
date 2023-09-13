@@ -1,3 +1,2 @@
 # Warnings currently triggered by your code
-- ignore: {name: "Unused LANGUAGE pragma"} # 4 hints
 - ignore: {name: "Use join"} # 1 hint
