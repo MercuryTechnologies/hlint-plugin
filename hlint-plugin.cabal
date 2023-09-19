@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               hlint-plugin
-version:            1.0.1
+version:            1.0.2
 synopsis:           GHC plugin for hlint
 description:
     This package provides a GHC plugin that runs `hlint` on the compiled
