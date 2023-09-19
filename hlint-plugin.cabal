@@ -3,7 +3,7 @@ name:               hlint-plugin
 version:            1.0.1
 synopsis:           GHC plugin for hlint
 description:
-    This package provides an GHC plugin that runs `hlint` on the compiled
+    This package provides a GHC plugin that runs `hlint` on the compiled
     module.  The main advantages of doing this are: (A) better integration with
     GHC tooling, (B) only linting modules that change, and (C) only parsing the
     module once.
@@ -32,16 +32,16 @@ library
     if impl(ghc >= 9.0 && < 9.2)
         hs-source-dirs: ghc90
         build-depends: hlint >= 3.3   && < 3.4
-                     , ghc   >= 9.0.2 && < 9.2
+                     , ghc   >= 9.0   && < 9.2
     if impl(ghc >= 9.2 && < 9.4)
         hs-source-dirs: ghc92
         build-depends: hlint >= 3.4   && < 3.5
-                     , ghc   >= 9.2.1 && < 9.4
+                     , ghc   >= 9.2   && < 9.4
     if impl(ghc >= 9.4 && < 9.6)
         hs-source-dirs: ghc94
         build-depends: hlint >= 3.5   && < 3.6
-                     , ghc   >= 9.4.1 && < 9.6
+                     , ghc   >= 9.4   && < 9.6
     if impl(ghc >= 9.6 && < 9.8)
         hs-source-dirs: ghc96
         build-depends: hlint >= 3.6   && < 3.7
-                     , ghc   >= 9.6.1 && < 9.8
+                     , ghc   >= 9.6   && < 9.8
