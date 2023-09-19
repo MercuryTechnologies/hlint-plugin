@@ -11,10 +11,6 @@
         config = { };
 
         overlay = self: super: {
-          hlint-plugin =
-            self.haskell.lib.justStaticExecutables
-              self.haskell.packages."${compiler}".hlint-plugin;
-
           haskell = super.haskell // {
             packages = super.haskell.packages // {
               "${compiler}" = super.haskell.packages."${compiler}".override (old: {
@@ -84,46 +80,40 @@
         rec {
           packages = pkgs.haskell.packages."${compiler}".hlint-plugin;
 
-          apps = {
-            type = "app";
+          checks =
+            let
+              module = pkgs.writeText "Main.hs"
+                ''
+                {-# LANGUAGE OverloadedStrings #-}
 
-            program = "${pkgs.hlint-plugin}/bin/hlint-plugin";
-          };
+                main :: IO ()
+                main | otherwise = (mempty)
+                '';
 
-         checks =
-           let
-             module = pkgs.writeText "Main.hs"
-               ''
-               {-# LANGUAGE OverloadedStrings #-}
+              expected = pkgs.writeText "expected.txt"
+                ''
 
-               main :: IO ()
-               main | otherwise = (mempty)
-               '';
-
-             expected = pkgs.writeText "expected.txt"
-               ''
-
-               Main.hs:4:20: warning:
-                   Redundant bracket
-                   Perhaps: mempty
-                 |
-               4 | main | otherwise = (mempty)
-                 |                    ^^^^^^^^
-               '';
-           in
-             pkgs.runCommand "hlint-plugin-${compiler}-test"
-               { nativeBuildInputs = [
-                   (pkgs.haskell.packages."${compiler}".ghcWithPackages
-                     (pkgs: [ pkgs.hlint-plugin ])
-                   )
-                 ];
-               }
-               ''
-               ln --symbolic ${module} Main.hs
-               ghc -fplugin HLint.Plugin -fplugin-opt='HLint.Plugin:--ignore=Redundant guard' -Wno-missed-extra-shared-lib -c Main.hs 2> >(tee actual.txt >&2)
-               diff ${expected} actual.txt
-               touch $out
-               '';
+                Main.hs:4:20: warning:
+                    Redundant bracket
+                    Perhaps: mempty
+                  |
+                4 | main | otherwise = (mempty)
+                  |                    ^^^^^^^^
+                '';
+            in
+              pkgs.runCommand "hlint-plugin-${compiler}-test"
+                { nativeBuildInputs = [
+                    (pkgs.haskell.packages."${compiler}".ghcWithPackages
+                      (pkgs: [ pkgs.hlint-plugin ])
+                    )
+                  ];
+                }
+                ''
+                ln --symbolic ${module} Main.hs
+                ghc -fplugin HLint.Plugin -fplugin-opt='HLint.Plugin:--ignore=Redundant guard' -Wno-missed-extra-shared-lib -c Main.hs 2> >(tee actual.txt >&2)
+                diff ${expected} actual.txt
+                touch $out
+                '';
 
           devShells = pkgs.haskell.packages."${compiler}".hlint-plugin.env;
         }
