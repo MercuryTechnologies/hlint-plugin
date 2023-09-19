@@ -20,18 +20,16 @@ module HLint.Plugin.Settings
     ) where
 
 import Control.Concurrent.MVar (MVar)
-import Data.IORef (IORef)
 import Data.Map (Map)
 import Language.Haskell.HLint (Classify, Hint, ParseFlags)
 
 import qualified Control.Concurrent.MVar as MVar
-import qualified Data.IORef as IORef
 import qualified Data.Map as Map
 import qualified Language.Haskell.HLint as HLint
 import qualified System.IO.Unsafe as Unsafe
 
-cache :: IORef (Map [String] (IO (ParseFlags, [Classify], Hint)))
-cache = Unsafe.unsafePerformIO (IORef.newIORef Map.empty)
+cache :: MVar (Map [String] (ParseFlags, [Classify], Hint))
+cache = Unsafe.unsafePerformIO (MVar.newMVar Map.empty)
 {-# NOINLINE cache #-}
 
 semaphore :: MVar ()
@@ -44,17 +42,14 @@ semaphore = Unsafe.unsafePerformIO (MVar.newMVar ())
 argsSettings
     :: [String]
     -> IO (ParseFlags, [Classify], Hint)
-argsSettings key = do
-    io <- IORef.atomicModifyIORef' cache \m -> do
+argsSettings key =
+    MVar.modifyMVar cache \m -> do
         case Map.lookup key m of
-            Nothing      -> do
-                let io =
-                        Unsafe.unsafeInterleaveIO do
-                            MVar.withMVar semaphore \_ -> HLint.argsSettings key
+            Nothing -> do
+                value <- Unsafe.unsafeInterleaveIO do
+                    MVar.withMVar semaphore \_ -> HLint.argsSettings key
 
-                (Map.insert key io m, io)
+                pure (Map.insert key value m, value)
 
-            Just io ->
-                (m, io)
-
-    io
+            Just value ->
+                pure (m, value)
