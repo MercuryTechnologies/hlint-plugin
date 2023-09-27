@@ -1,5 +1,4 @@
 {-# LANGUAGE NamedFieldPuns  #-}
-{-# LANGUAGE PackageImports  #-}
 {-# LANGUAGE RecordWildCards #-}
 
 -- | This module provides a GHC plugin that you can use to run HLint on a
