@@ -1,0 +1,7 @@
+resolver: lts-21.13
+
+flags:
+  ghc-lib-parser-ex:
+    no-ghc-lib: true
+  hlint:
+    ghc-lib: false
