@@ -19,6 +19,13 @@ copyright:          2023 Mercury Technologies
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 extra-source-files: README.md
+category:           Development
+homepage:           https://github.com/MercuryTechnologies/hlint-plugin#readme
+bug-reports:        https://github.com/MercuryTechnologies/hlint-plugin/issues
+
+source-repository head
+  type: git
+  location: https://github.com/MercuryTechnologies/hlint-plugin
 
 library
     hs-source-dirs:   src
